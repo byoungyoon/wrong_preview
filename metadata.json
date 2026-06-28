@@ -1,0 +1,6 @@
+{
+  "name": "오답연애",
+  "description": "나의 아찔했던 연애 오답노트 | 반익명 연애 에피소드 플랫폼",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
