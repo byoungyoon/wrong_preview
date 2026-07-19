@@ -12,6 +12,33 @@ module.exports = {
         allowUndefined: true,
       },
     ],
+    [
+      'module-resolver',
+      {
+        root: ['.'],
+        extensions: [
+          '.ios.ts',
+          '.android.ts',
+          '.ios.tsx',
+          '.android.tsx',
+          '.ts',
+          '.tsx',
+          '.ios.js',
+          '.android.js',
+          '.js',
+          '.jsx',
+          '.json',
+        ],
+        alias: {
+          '@screens': './src/screens',
+          '@components': './src/components',
+          '@store': './src/store',
+          '@app-types': './src/types',
+          '@api': './src/api',
+          '@hooks': './src/hooks',
+        },
+      },
+    ],
     'nativewind/babel',
   ],
 };

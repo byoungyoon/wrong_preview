@@ -1,7 +1,9 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 
-export const NotebookPaper: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const NotebookPaper: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const lineCount = 25; // Pre-render up to 25 lines to cover longer text
   const lines = Array.from({ length: lineCount });
 
@@ -14,7 +16,7 @@ export const NotebookPaper: React.FC<{ children: React.ReactNode }> = ({ childre
             key={i}
             style={[
               styles.line,
-              { top: 22 + i * 28 } // Repeated vertical lines
+              { top: 22 + i * 28 }, // Repeated vertical lines
             ]}
           />
         ))}
@@ -23,9 +25,7 @@ export const NotebookPaper: React.FC<{ children: React.ReactNode }> = ({ childre
       </View>
 
       {/* Content Container */}
-      <View style={styles.content}>
-        {children}
-      </View>
+      <View style={styles.content}>{children}</View>
     </View>
   );
 };
@@ -60,6 +60,6 @@ const styles = StyleSheet.create({
   },
   content: {
     zIndex: 1,
-  }
+  },
 });
 export default NotebookPaper;

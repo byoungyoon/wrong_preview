@@ -4,19 +4,23 @@ import {
   Text,
   TouchableOpacity,
   StatusBar,
-  useColorScheme
+  useColorScheme,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createBottomTabNavigator, BottomTabBarProps } from '@react-navigation/bottom-tabs';
+import {
+  createBottomTabNavigator,
+  BottomTabBarProps,
+} from '@react-navigation/bottom-tabs';
 import { Flame, PenTool, User } from 'lucide-react-native';
 
-import { OhdabProvider, useOhdabViewModel } from './src/hooks/useOhdabViewModel';
-import FeedScreen from './src/screens/FeedScreen';
-import WriteScreen from './src/screens/WriteScreen';
-import MyScreen from './src/screens/MyScreen';
-import LoginScreen from './src/screens/LoginScreen';
+import { useStore } from '@store/useStore';
+import { useToastStore } from '@store/useToastStore';
+import FeedScreen from '@screens/feed/FeedScreen';
+import WriteScreen from '@screens/write/WriteScreen';
+import MyScreen from '@screens/my/MyScreen';
+import LoginScreen from '@screens/login/LoginScreen';
 
 // Types for Navigation Param Lists
 export type RootStackParamList = {
@@ -36,7 +40,10 @@ const Tab = createBottomTabNavigator<MainTabParamList>();
 // --- Custom Tab Bar Component ---
 function CustomTabBar({ state, navigation }: BottomTabBarProps) {
   return (
-    <SafeAreaView edges={['bottom']} className="bg-white border-t border-neutral-outline/30 shadow-lg">
+    <SafeAreaView
+      edges={['bottom']}
+      className="bg-white border-t border-neutral-outline/30 shadow-lg"
+    >
       <View className="flex-row h-14 items-center">
         {state.routes.map((route, index) => {
           const isFocused = state.index === index;
@@ -69,7 +76,9 @@ function CustomTabBar({ state, navigation }: BottomTabBarProps) {
 
           const iconColor = isFocused ? '#F43F5E' : '#49454F';
           const iconSize = isFocused ? 22 : 20;
-          const labelColorClass = isFocused ? 'text-brand-rose' : 'text-neutral-slate';
+          const labelColorClass = isFocused
+            ? 'text-brand-rose'
+            : 'text-neutral-slate';
 
           return (
             <TouchableOpacity
@@ -110,15 +119,23 @@ function MainTabNavigator() {
   );
 }
 
-// --- Main App Navigation Guard ---
 function AppContent() {
   const isDarkMode = useColorScheme() === 'dark';
-  const { session } = useOhdabViewModel();
+  const session = useStore(state => state.session);
+  const initializeAuth = useStore(state => state.initializeAuth);
+
+  useEffect(() => {
+    const unsubscribe = initializeAuth();
+    return () => unsubscribe();
+  }, [initializeAuth]);
 
   return (
     <View className="flex-1 bg-bg-lavender">
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} backgroundColor="#FEF7FF" />
-      
+      <StatusBar
+        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
+        backgroundColor="#FEF7FF"
+      />
+
       <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
           {!session ? (
@@ -135,9 +152,9 @@ function AppContent() {
   );
 }
 
-// --- Floating Toast Overlay ---
 const ToastNotification: React.FC = () => {
-  const { toastMessage, clearToast } = useOhdabViewModel();
+  const toastMessage = useToastStore(state => state.toastMessage);
+  const clearToast = useToastStore(state => state.clearToast);
 
   useEffect(() => {
     if (toastMessage) {
@@ -151,18 +168,19 @@ const ToastNotification: React.FC = () => {
   if (!toastMessage) return null;
 
   return (
-    <View className="absolute left-5 right-5 bottom-[90px] items-center z-[9999]" pointerEvents="none">
+    <View
+      className="absolute left-5 right-5 bottom-[90px] items-center z-[9999]"
+      pointerEvents="none"
+    >
       <View className="bg-[#31111D] rounded-[24px] px-5 py-3 shadow-md">
-        <Text className="text-white text-[13px] font-bold text-center">{toastMessage}</Text>
+        <Text className="text-white text-[13px] font-bold text-center">
+          {toastMessage}
+        </Text>
       </View>
     </View>
   );
 };
 
 export default function App() {
-  return (
-    <OhdabProvider>
-      <AppContent />
-    </OhdabProvider>
-  );
+  return <AppContent />;
 }

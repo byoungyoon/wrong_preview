@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -8,11 +8,19 @@ import {
   Animated,
   Easing,
   KeyboardAvoidingView,
-  Platform
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Sparkles, RefreshCw, Pin, FileText, Zap, Lightbulb, CheckCircle2 } from 'lucide-react-native';
-import { useOhdabViewModel } from '../hooks/useOhdabViewModel';
+import {
+  Sparkles,
+  RefreshCw,
+  Pin,
+  FileText,
+  Zap,
+  Lightbulb,
+  CheckCircle2,
+} from 'lucide-react-native';
+import { useWriteStore } from './useWriteStore';
 
 export const WriteScreen: React.FC = () => {
   const {
@@ -26,20 +34,26 @@ export const WriteScreen: React.FC = () => {
     updateDraftClimax,
     updateDraftAction,
     toggleTag,
-    submitPost
-  } = useOhdabViewModel();
+    submitPost,
+  } = useWriteStore();
+
+  useEffect(() => {
+    if (!draftNickname) {
+      generateRandomNickname();
+    }
+  }, [draftNickname, generateRandomNickname]);
 
   const availableTags = [
-    "#회피형_잠수함",
-    "#가성비_집착러",
-    "#눈물의_가스라이팅",
-    "#환승이별_장인",
-    "#질투의_화신",
-    "#전애인_염탐러",
-    "#소심끝판왕",
-    "#연락두절_잠수교",
-    "#비밀번호_털이범",
-    "#유령_이별"
+    '#회피형_잠수함',
+    '#가성비_집착러',
+    '#눈물의_가스라이팅',
+    '#환승이별_장인',
+    '#질투의_화신',
+    '#전애인_염탐러',
+    '#소심끝판왕',
+    '#연락두절_잠수교',
+    '#비밀번호_털이범',
+    '#유령_이별',
   ];
 
   // Rotation animation for nickname refresh
@@ -50,14 +64,14 @@ export const WriteScreen: React.FC = () => {
       toValue: 1,
       duration: 500,
       easing: Easing.linear,
-      useNativeDriver: true
+      useNativeDriver: true,
     }).start();
     generateRandomNickname();
   };
 
   const spin = rotateAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: ['0deg', '360deg']
+    outputRange: ['0deg', '360deg'],
   });
 
   return (
@@ -66,7 +80,10 @@ export const WriteScreen: React.FC = () => {
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         className="flex-1"
       >
-        <ScrollView contentContainerStyle={{ padding: 16, paddingBottom: 48 }} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={{ padding: 16, paddingBottom: 48 }}
+          showsVerticalScrollIndicator={false}
+        >
           {/* Heading Banner */}
           <View className="bg-white rounded-[24px] border border-neutral-outline/20 p-4 mb-4">
             <View className="flex-row items-start">
@@ -74,9 +91,13 @@ export const WriteScreen: React.FC = () => {
                 <Sparkles color="#F59E0B" size={24} fill="#F59E0B" />
               </View>
               <View className="flex-1">
-                <Text className="text-logo-title font-bold text-neutral-charcoal">구조화된 연애 오답노트 적기</Text>
+                <Text className="text-logo-title font-bold text-neutral-charcoal">
+                  구조화된 연애 오답노트 적기
+                </Text>
                 <Text className="text-tag-sub text-neutral-slate mt-1">
-                  줄글 대신 3단계 양식으로 적어 가독성을 높입니다. AI 분석을 실행하면 실명/회사 등이 마스킹 처리되고, 오답 훈수 코멘트가 자동 발행됩니다.
+                  줄글 대신 3단계 양식으로 적어 가독성을 높입니다. AI 분석을
+                  실행하면 실명/회사 등이 마스킹 처리되고, 오답 훈수 코멘트가
+                  자동 발행됩니다.
                 </Text>
               </View>
             </View>
@@ -85,8 +106,12 @@ export const WriteScreen: React.FC = () => {
           {/* Pseudo-Anonymous Nickname Combination */}
           <View className="bg-white rounded-[24px] border border-neutral-outline/15 p-4 flex-row justify-between items-center mb-4">
             <View>
-              <Text className="text-tag-sub text-neutral-slate">임시 부여된 닉네임</Text>
-              <Text className="text-logo-title font-bold text-brand-rose mt-0.5">{draftNickname}</Text>
+              <Text className="text-tag-sub text-neutral-slate">
+                임시 부여된 닉네임
+              </Text>
+              <Text className="text-logo-title font-bold text-brand-rose mt-0.5">
+                {draftNickname}
+              </Text>
             </View>
             <TouchableOpacity
               className="w-9 h-9 rounded-full bg-[#F7F2FA] justify-center items-center"
@@ -135,13 +160,19 @@ export const WriteScreen: React.FC = () => {
           {/* Tag Selector */}
           <View className="flex-row items-center gap-1.5 mb-2.5">
             <Pin color="#21005D" size={14} />
-            <Text className="text-body-text font-bold text-neutral-charcoal">필수 오답 태그 선택 (중복 가능)</Text>
+            <Text className="text-body-text font-bold text-neutral-charcoal">
+              필수 오답 태그 선택 (중복 가능)
+            </Text>
           </View>
           <View className="flex-row flex-wrap mb-4">
-            {availableTags.map((tag) => {
+            {availableTags.map(tag => {
               const isSelected = selectedTags.has(tag);
-              const tagBgClass = isSelected ? "bg-brand-rose" : "bg-[#F7F2FA] border border-neutral-outline/20";
-              const tagTextClass = isSelected ? "text-white" : "text-neutral-slate";
+              const tagBgClass = isSelected
+                ? 'bg-brand-rose'
+                : 'bg-[#F7F2FA] border border-neutral-outline/20';
+              const tagTextClass = isSelected
+                ? 'text-white'
+                : 'text-neutral-slate';
 
               return (
                 <TouchableOpacity
@@ -165,7 +196,9 @@ export const WriteScreen: React.FC = () => {
             activeOpacity={0.8}
           >
             <CheckCircle2 color="#FFFFFF" size={16} />
-            <Text className="text-logo-title font-bold text-white">오답노트 등록하기</Text>
+            <Text className="text-logo-title font-bold text-white">
+              오답노트 등록하기
+            </Text>
           </TouchableOpacity>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -189,13 +222,17 @@ const OhdabInputField: React.FC<InputFieldProps> = ({
   value,
   onChangeText,
   IconComponent,
-  iconColor
+  iconColor,
 }) => {
   return (
     <View className="mb-3.5">
       <View className="flex-row items-center gap-1.5 mb-1.5">
-        {IconComponent && <IconComponent color={iconColor || "#21005D"} size={14} />}
-        <Text className="text-body-text font-semibold text-neutral-charcoal">{label}</Text>
+        {IconComponent && (
+          <IconComponent color={iconColor || '#21005D'} size={14} />
+        )}
+        <Text className="text-body-text font-semibold text-neutral-charcoal">
+          {label}
+        </Text>
       </View>
       <TextInput
         className="bg-white border border-neutral-outline/30 rounded-xl h-[100px] px-3 py-2.5 text-body-text text-neutral-charcoal"
